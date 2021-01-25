@@ -78,9 +78,9 @@ class Game extends React.Component {
         let status;
         const winner = this.judgeWinner(blackCount, whiteCount);
         if(winner === 0){
-          status = "Draw (blackCount : " + blackCount + " whiteCount : " + whiteCount + ")";
+          status = "Draw";
         } else {
-          status = cellTypes[winner] + " win (blackCount : " + blackCount + " whiteCount : " + whiteCount + ")";
+          status = cellTypes[winner] + " win";
         }
 
         this.setState({
