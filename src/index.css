@@ -19,6 +19,15 @@ body {
   background-color: #00ee00;
 }
 
+.square-cell-hilight {
+  position: relative;
+  top: 1px;
+  left: 1px;
+  width: 31px;
+  height: 31px;
+  background-color: #eeee00;
+}
+
 .square-empty {
   position: relative;
 }

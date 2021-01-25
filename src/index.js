@@ -8,7 +8,7 @@ class Square extends React.Component {
   render() {
     return (
       <div className="square" style={{top: this.props.top, left: this.props.left}} onClick={this.props.onClick}>
-        <div className="square-cell">
+        <div className={this.props.hilight ? "square-cell-hilight" : "square-cell"}>
           <div className={"square-" + cellTypes[this.props.value]}></div>
         </div>
       </div>
@@ -17,15 +17,15 @@ class Square extends React.Component {
 }
 
 class Board extends React.Component {
-  renderSquare(x, y, value) {
-    return <Square key={x+","+y} top={y*32} left={x*32} value={value} onClick={() => this.props.onClick(x, y)} />;
+  renderSquare(x, y, value, hilight) {
+    return <Square key={x+","+y} top={y*32} left={x*32} value={value} hilight={hilight} onClick={() => this.props.onClick(x, y)} />;
   }
 
   render() {
     const boardDom = [];
     for (let y = 0; y < this.props.squares.length; y++) {
       for (let x = 0; x < this.props.squares[y].length; x++) {
-        boardDom.push(this.renderSquare(x ,y, this.props.squares[y][x]));
+        boardDom.push(this.renderSquare(x, y, this.props.squares[y][x], this.props.hilightSquares[y][x]));
       }
     }
 
@@ -40,13 +40,13 @@ class Game extends React.Component {
     super(props);
     const currentTurn = 1;
     this.state = {
-      squares: Array(8).fill(null),
+      squares: Array(8).fill(null).map(() => Array(8).fill(0)),
       turn: currentTurn,
       status: cellTypes[currentTurn] + " move",
       blackCount: 0,
       whiteCount: 0,
+      hilightSquares: Array(8).fill(null).map(() => Array(8).fill(false)),
     }
-    this.state.squares = this.state.squares.map(() => Array(8).fill(0));
     this.state.squares[3][3] = 1;
     this.state.squares[4][4] = 1;
     this.state.squares[3][4] = 2;
@@ -55,6 +55,8 @@ class Game extends React.Component {
     const [blackCount, whiteCount] = this.countSquares(this.state.squares);
     this.state.blackCount = blackCount;
     this.state.whiteCount = whiteCount;
+
+    this.state.hilightSquares = this.hilight(this.state.squares, currentTurn);
   }
 
   handleClick(x, y){
@@ -69,6 +71,7 @@ class Game extends React.Component {
       
       const nextTurn = this.turnChange(currentSquares, currentTurn);
       const [blackCount, whiteCount] = this.countSquares(currentSquares);
+      const hilightSquares = this.hilight(currentSquares, nextTurn);
       
       if(nextTurn === 0){
         //Game End
@@ -86,6 +89,7 @@ class Game extends React.Component {
           status: status,
           blackCount: blackCount,
           whiteCount: whiteCount,
+          hilightSquares: hilightSquares,
         });
       } else {
         this.setState({
@@ -94,9 +98,22 @@ class Game extends React.Component {
           status: cellTypes[nextTurn] + " move",
           blackCount: blackCount,
           whiteCount: whiteCount,
+          hilightSquares: hilightSquares,
         });
       }
     }
+  }
+
+  hilight(currentSquares, currentTurn) {
+    const hilightSquares = Array(8).fill(null).map(() => Array(8).fill(false));
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        if(this.checkPuttable(x, y, currentTurn, currentSquares).length > 0){
+          hilightSquares[y][x] = true;
+        }
+      }
+    }
+    return hilightSquares;
   }
 
   countSquares(currentSquares) {
@@ -184,7 +201,7 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={this.state.squares} turn={this.state.turn} onClick={(x, y) => this.handleClick(x, y)}/>
+          <Board squares={this.state.squares} hilightSquares={this.state.hilightSquares} turn={this.state.turn} onClick={(x, y) => this.handleClick(x, y)}/>
         </div>
         <div className="game-info">
           <div className="status">{this.state.status}</div>
