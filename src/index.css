@@ -1,0 +1,59 @@
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+.square {
+  position: absolute;
+  width: 33px;
+  height: 33px;
+  background-color: #000;
+}
+
+.square-cell {
+  position: relative;
+  top: 1px;
+  left: 1px;
+  width: 31px;
+  height: 31px;
+  background-color: #00ee00;
+}
+
+.square-empty {
+  position: relative;
+}
+
+.square-white {
+  position: relative;
+  width: 31px;
+  height: 31px;
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+.square-black {
+  position: relative;
+  width: 31px;
+  height: 31px;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.game {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.game-board {
+  width: 256px;
+  height: 256px;
+}
+
+.game-info {
+  margin-left: 20px;
+}
