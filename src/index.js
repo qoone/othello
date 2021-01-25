@@ -43,12 +43,18 @@ class Game extends React.Component {
       squares: Array(8).fill(null),
       turn: currentTurn,
       status: cellTypes[currentTurn] + " move",
+      blackCount: 0,
+      whiteCount: 0,
     }
     this.state.squares = this.state.squares.map(() => Array(8).fill(0));
     this.state.squares[3][3] = 1;
     this.state.squares[4][4] = 1;
     this.state.squares[3][4] = 2;
     this.state.squares[4][3] = 2;
+
+    const [blackCount, whiteCount] = this.countSquares(this.state.squares);
+    this.state.blackCount = blackCount;
+    this.state.whiteCount = whiteCount;
   }
 
   handleClick(x, y){
@@ -62,11 +68,12 @@ class Game extends React.Component {
       currentSquares[y][x] = currentTurn;
       
       const nextTurn = this.turnChange(currentSquares, currentTurn);
+      const [blackCount, whiteCount] = this.countSquares(currentSquares);
       
       if(nextTurn === 0){
         //Game End
         let status;
-        const {winner, blackCount, whiteCount} = this.judgeWinner(currentSquares);
+        const winner = this.judgeWinner(blackCount, whiteCount);
         if(winner === 0){
           status = "Draw (blackCount : " + blackCount + " whiteCount : " + whiteCount + ")";
         } else {
@@ -77,18 +84,22 @@ class Game extends React.Component {
           squares: currentSquares,
           turn: nextTurn,
           status: status,
+          blackCount: blackCount,
+          whiteCount: whiteCount,
         });
       } else {
         this.setState({
           squares: currentSquares,
           turn: nextTurn,
           status: cellTypes[nextTurn] + " move",
+          blackCount: blackCount,
+          whiteCount: whiteCount,
         });
       }
     }
   }
 
-  judgeWinner(currentSquares) {
+  countSquares(currentSquares) {
     let blackCount = 0
     let whiteCount = 0;
     currentSquares.forEach((row) => {
@@ -100,13 +111,17 @@ class Game extends React.Component {
         }
       });
     });
+    return [blackCount, whiteCount];
+  }
+
+  judgeWinner(blackCount, whiteCount) {
     let winner = 0;
     if(blackCount > whiteCount){
       winner = 1;
     } else if(whiteCount > blackCount){
       winner = 2;
     }
-    return {winner:winner, blackCount:blackCount, whiteCount:whiteCount};
+    return winner;
   }
 
   turnChange(currentSquares, currentTurn) {
@@ -172,8 +187,17 @@ class Game extends React.Component {
           <Board squares={this.state.squares} turn={this.state.turn} onClick={(x, y) => this.handleClick(x, y)}/>
         </div>
         <div className="game-info">
-          <div>{this.state.status}</div>
-          <ol>{/* TODO */}</ol>
+          <div className="status">{this.state.status}</div>
+          <br />
+          <div className="square-cell">
+            <div className="square-black" />
+          </div>
+          <div class="cell-count">{this.state.blackCount}</div>
+          <br />
+          <div className="square-cell">
+            <div className="square-white" />
+          </div>
+          <div class="cell-count">{this.state.whiteCount}</div>
         </div>
       </div>
     );

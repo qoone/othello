@@ -57,3 +57,15 @@ body {
 .game-info {
   margin-left: 20px;
 }
+
+.status {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.cell-count {
+  width: 32px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
