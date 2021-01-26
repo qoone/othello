@@ -40,42 +40,38 @@ class Game extends React.Component {
     super(props);
     const currentTurn = 1;
     this.state = {
-      squares: Array(8).fill(null).map(() => Array(8).fill(0)),
-      turn: currentTurn,
-      status: cellTypes[currentTurn] + " move",
-      blackCount: 0,
-      whiteCount: 0,
-      hilightSquares: Array(8).fill(null).map(() => Array(8).fill(false)),
+      current: {
+        squares: Array(8).fill(null).map(() => Array(8).fill(0)),
+        turn: currentTurn,
+        status: cellTypes[currentTurn] + " move",
+      },
+      currentTurnIndex: 0,
+      history: [],
     }
-    this.state.squares[3][3] = 1;
-    this.state.squares[4][4] = 1;
-    this.state.squares[3][4] = 2;
-    this.state.squares[4][3] = 2;
+    this.state.current.squares[3][3] = 1;
+    this.state.current.squares[4][4] = 1;
+    this.state.current.squares[3][4] = 2;
+    this.state.current.squares[4][3] = 2;
 
-    const [blackCount, whiteCount] = this.countSquares(this.state.squares);
-    this.state.blackCount = blackCount;
-    this.state.whiteCount = whiteCount;
-
-    this.state.hilightSquares = this.hilight(this.state.squares, currentTurn);
+    this.state.history.push(this.state.current);
   }
 
   handleClick(x, y){
-    const currentSquares = this.state.squares.slice();
-    const currentTurn = this.state.turn;
-
+    const currentSquares = this.state.current.squares.slice().map((element) => element.slice());
+    const currentTurn = this.state.current.turn;
     const flipables = this.checkPuttable(x, y, currentTurn, currentSquares);
     if(flipables.length > 0) {
       //コマを置いて、周りをひっくり返す
       this.executeFlip(flipables, currentSquares, currentTurn);
       currentSquares[y][x] = currentTurn;
       
+      
       const nextTurn = this.turnChange(currentSquares, currentTurn);
-      const [blackCount, whiteCount] = this.countSquares(currentSquares);
-      const hilightSquares = this.hilight(currentSquares, nextTurn);
       
       if(nextTurn === 0){
         //Game End
         let status;
+        const [blackCount, whiteCount] = this.countSquares(this.state.current.squares);
         const winner = this.judgeWinner(blackCount, whiteCount);
         if(winner === 0){
           status = "Draw";
@@ -83,25 +79,41 @@ class Game extends React.Component {
           status = cellTypes[winner] + " win";
         }
 
-        this.setState({
+        const current = {
           squares: currentSquares,
           turn: nextTurn,
           status: status,
-          blackCount: blackCount,
-          whiteCount: whiteCount,
-          hilightSquares: hilightSquares,
+        };
+        const history = this.state.history.slice(0, this.state.currentTurnIndex + 1);
+        history.push(current);
+        this.setState({
+          current: current,
+          currentTurnIndex: this.state.currentTurnIndex + 1,
+          history: history,
         });
       } else {
-        this.setState({
+        const current = {
           squares: currentSquares,
           turn: nextTurn,
           status: cellTypes[nextTurn] + " move",
-          blackCount: blackCount,
-          whiteCount: whiteCount,
-          hilightSquares: hilightSquares,
+        };
+        const history = this.state.history.slice(0, this.state.currentTurnIndex + 1);
+        history.push(current);
+        this.setState({
+          current: current,
+          currentTurnIndex: this.state.currentTurnIndex + 1,
+          history: history,
         });
       }
     }
+  }
+
+  moveTurnIndex(turnIndex) {
+    const current = this.state.history[turnIndex];
+    this.setState({
+      current: current,
+      currentTurnIndex: turnIndex,
+    });
   }
 
   hilight(currentSquares, currentTurn) {
@@ -198,23 +210,33 @@ class Game extends React.Component {
   }
 
   render() {
+    const [blackCount, whiteCount] = this.countSquares(this.state.current.squares);
+    const hilightSquares = this.hilight(this.state.current.squares, this.state.current.turn);
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={this.state.squares} hilightSquares={this.state.hilightSquares} turn={this.state.turn} onClick={(x, y) => this.handleClick(x, y)}/>
+          <Board squares={this.state.current.squares} hilightSquares={hilightSquares} turn={this.state.current.turn} onClick={(x, y) => this.handleClick(x, y)}/>
         </div>
         <div className="game-info">
-          <div className="status">{this.state.status}</div>
+          <div className="status">{this.state.current.status}</div>
           <br />
           <div className="square-cell">
             <div className="square-black" />
           </div>
-          <div class="cell-count">{this.state.blackCount}</div>
+          <div className="cell-count">{blackCount}</div>
           <br />
           <div className="square-cell">
             <div className="square-white" />
           </div>
-          <div class="cell-count">{this.state.whiteCount}</div>
+          <div className="cell-count">{whiteCount}</div>
+          
+          <div className="buttons">
+            <button onClick={() => this.moveTurnIndex(0)} disabled={this.state.currentTurnIndex === 0}>初めに戻る</button><br />
+            <button onClick={() => this.moveTurnIndex(this.state.currentTurnIndex - 1)} disabled={this.state.currentTurnIndex === 0}>一つ戻る</button><br />
+            <button onClick={() => this.moveTurnIndex(this.state.currentTurnIndex + 1)} disabled={this.state.history.length - 1 <= this.state.currentTurnIndex}>一つ進む</button><br />
+            <button onClick={() => this.moveTurnIndex(this.state.history.length - 1)} disabled={this.state.history.length - 1 <= this.state.currentTurnIndex}>最後に進む</button>
+          </div>
         </div>
       </div>
     );

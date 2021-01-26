@@ -16,7 +16,7 @@ body {
   left: 1px;
   width: 31px;
   height: 31px;
-  background-color: #00ee00;
+  background-color: #00e000;
 }
 
 .square-cell-hilight {
@@ -25,7 +25,7 @@ body {
   left: 1px;
   width: 31px;
   height: 31px;
-  background-color: #eeee00;
+  background-color: #fceb70;
 }
 
 .square-empty {
