@@ -38,27 +38,31 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props){
     super(props);
-    const currentTurn = 1;
+
+    const initTurn = 1;
+    const initSquares = Array(8).fill(null).map(() => Array(8).fill(0));
+    initSquares[3][3] = 1;
+    initSquares[4][4] = 1;
+    initSquares[3][4] = 2;
+    initSquares[4][3] = 2;
+
     this.state = {
       current: {
-        squares: Array(8).fill(null).map(() => Array(8).fill(0)),
-        turn: currentTurn,
-        status: cellTypes[currentTurn] + " move",
+        squares: initSquares,
+        turn: initTurn,
+        status: cellTypes[initTurn] + " move",
       },
       currentTurnIndex: 0,
-      history: [],
+      history: [initSquares],
     }
-    this.state.current.squares[3][3] = 1;
-    this.state.current.squares[4][4] = 1;
-    this.state.current.squares[3][4] = 2;
-    this.state.current.squares[4][3] = 2;
-
-    this.state.history.push(this.state.current);
   }
 
   handleClick(x, y){
     const currentSquares = this.state.current.squares.slice().map((element) => element.slice());
     const currentTurn = this.state.current.turn;
+    const currentTurnIndex = this.state.currentTurnIndex;
+    const currentHistory = this.state.history;
+
     const flipables = this.checkPuttable(x, y, currentTurn, currentSquares);
     if(flipables.length > 0) {
       //コマを置いて、周りをひっくり返す
@@ -71,7 +75,7 @@ class Game extends React.Component {
       if(nextTurn === 0){
         //Game End
         let status;
-        const [blackCount, whiteCount] = this.countSquares(this.state.current.squares);
+        const [blackCount, whiteCount] = this.countSquares(currentSquares);
         const winner = this.judgeWinner(blackCount, whiteCount);
         if(winner === 0){
           status = "Draw";
@@ -84,11 +88,11 @@ class Game extends React.Component {
           turn: nextTurn,
           status: status,
         };
-        const history = this.state.history.slice(0, this.state.currentTurnIndex + 1);
+        const history = currentHistory.slice(0, currentTurnIndex + 1);
         history.push(current);
         this.setState({
           current: current,
-          currentTurnIndex: this.state.currentTurnIndex + 1,
+          currentTurnIndex: currentTurnIndex + 1,
           history: history,
         });
       } else {
@@ -97,11 +101,11 @@ class Game extends React.Component {
           turn: nextTurn,
           status: cellTypes[nextTurn] + " move",
         };
-        const history = this.state.history.slice(0, this.state.currentTurnIndex + 1);
+        const history = currentHistory.slice(0, currentTurnIndex + 1);
         history.push(current);
         this.setState({
           current: current,
-          currentTurnIndex: this.state.currentTurnIndex + 1,
+          currentTurnIndex: currentTurnIndex + 1,
           history: history,
         });
       }
