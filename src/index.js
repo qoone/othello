@@ -35,6 +35,8 @@ class Board extends React.Component {
   }
 }
 
+const USE_COMPUTER_MODE = true;
+
 class Game extends React.Component {
   constructor(props){
     super(props);
@@ -108,6 +110,25 @@ class Game extends React.Component {
           currentTurnIndex: currentTurnIndex + 1,
           history: history,
         });
+      }
+
+      if(USE_COMPUTER_MODE && nextTurn === 2){
+        setTimeout(() => this.handleComputer(nextTurn), 300);
+      }
+    }
+  }
+
+  handleComputer(currentTurn) {
+    const [x, y] = this.decideComputerHand(this.state.current.squares, currentTurn);
+    this.handleClick(x, y);
+  }
+
+  decideComputerHand(currentSquares, currentTurn){
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        if(this.checkPuttable(x, y, currentTurn, currentSquares).length > 0){
+          return [x, y];
+        }
       }
     }
   }
