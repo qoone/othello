@@ -47,15 +47,16 @@ class Game extends React.Component {
     initSquares[4][4] = 1;
     initSquares[3][4] = 2;
     initSquares[4][3] = 2;
+    const current = {
+      squares: initSquares,
+      turn: initTurn,
+      status: cellTypes[initTurn] + " move",
+    };
 
     this.state = {
-      current: {
-        squares: initSquares,
-        turn: initTurn,
-        status: cellTypes[initTurn] + " move",
-      },
+      current: current,
       currentTurnIndex: 0,
-      history: [initSquares],
+      history: [current],
     }
   }
 
