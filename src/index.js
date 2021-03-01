@@ -263,6 +263,10 @@ class Game extends React.Component {
             <button onClick={() => this.moveTurnIndex(this.state.currentTurnIndex + 1)} disabled={this.state.history.length - 1 <= this.state.currentTurnIndex}>一つ進む</button><br />
             <button onClick={() => this.moveTurnIndex(this.state.history.length - 1)} disabled={this.state.history.length - 1 <= this.state.currentTurnIndex}>最後に進む</button>
           </div>
+
+          <div>
+            hello world
+          </div>
         </div>
       </div>
     );
